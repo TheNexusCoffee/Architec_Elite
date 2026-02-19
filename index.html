@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Architect Elite — AI Visual Studio</title>
+
+    <!-- SEO & Meta -->
+    <meta name="description"
+        content="La herramienta definitiva para arquitectos de prompts. Diseña visiones cinematográficas para Midjourney, Sora, Kling y más.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Palette: Deep Deep Sea & Neon Accents */
+            --bg-color: #06090f;
+            --surface-color: #0d1117;
+            --surface-accent: #161b22;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --accent-glow: 0 0 20px rgba(168, 85, 247, 0.4);
+
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
+            --primary: #818cf8;
+            --secondary: #c084fc;
+            --success: #238636;
+            --danger: #f85149;
+
+            --border: rgba(240, 246, 252, 0.1);
+            --border-hover: rgba(240, 246, 252, 0.2);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: blur(12px) saturate(180%);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --surface-accent: #f1f5f9;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --border: rgba(15, 23, 42, 0.08);
+            --border-hover: rgba(15, 23, 42, 0.15);
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface-accent);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-hover);
+        }
+
+        /* Layout Structure */
+        .app-shell {
+            display: grid;
+            grid-template-columns: 280px 1fr 380px;
+            height: 100vh;
+            max-width: 2500px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1400px) {
+            .app-shell {
+                grid-template-columns: 80px 1fr 350px;
+            }
+
+            .sidebar-nav span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+                height: auto;
+            }
+
+            .sidebar-nav {
+                display: none;
+            }
+
+            .preview-aside {
+                position: sticky;
+                bottom: 0;
+                height: auto;
+                z-index: 100;
+                padding: 1rem;
+            }
+        }
+
+        /* Sidebar Navigation (Left) */
+        .sidebar-nav {
+            background: var(--surface-color);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            text-decoration: none;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--surface-accent);
+            color: var(--text-main);
+        }
+
+        .nav-link.active i {
+            color: var(--primary);
+        }
+
+        /* Main Content (Center) */
+        .main-content {
+            padding: 2.5rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: var(--surface-color);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+        }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .category-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .category-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-title i {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        /* Chips Grid */
+        .chips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .chip {
+            aspect-ratio: 1;
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            background: var(--surface-accent);
+        }
+
+        .chip img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            opacity: 0.8;
+            background: var(--surface-accent);
+            /* Fallback background */
+        }
+
+        .chip.img-error::before {
+            content: "\f03e";
+            /* FontAwesome image icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            opacity: 0.3;
+        }
+
+        .chip:hover img {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .chip .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+            pointer-events: none;
+        }
+
+        .chip .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
+        }
+
+        .chip.active {
+            border-color: var(--primary);
+            box-shadow: var(--accent-glow);
+        }
+
+        .chip.active .checkmark {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            z-index: 2;
+        }
+
+        /* Preview Sidebar (Right) */
+        .preview-aside {
+            background: var(--surface-color);
+            border-left: 1px solid var(--border);
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .preview-section {
+            background: var(--surface-accent);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subject-container {
+            position: relative;
+        }
+
+        .subject-area {
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            color: var(--text-main);
+            font-family: inherit;
+            resize: none;
+            min-height: 80px;
+            transition: var(--transition);
+        }
+
+        .subject-area:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .prompt-builder {
+            background: var(--bg-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            border: 1px dashed var(--border);
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            min-height: 200px;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .tag-block {
+            display: inline-block;
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 10px 20px rgba(129, 140, 248, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(129, 140, 248, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--surface-accent);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Theme Toggle */
+        .theme-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--surface-color);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        /* Toast Container */
+        #notification-host {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--surface-color);
+            color: var(--text-main);
+            padding: 1rem 1.5rem;
+            border-radius: 100px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            pointer-events: auto;
+        }
+
+        .toast i {
+            color: var(--success);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Empty States & Specificity */
+        .hidden {
+            display: none !important;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--surface-accent);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-dim);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .type-btn.active {
+            background: rgba(129, 140, 248, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .quick-nav {
+            position: fixed;
+            right: 400px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .dot-nav {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dot-nav:hover,
+        .dot-nav.active {
+            background: var(--primary);
+            transform: scale(1.5);
+        }
+
+        @media (max-width: 1400px) {
+            .quick-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="notification-host"></div>
+
+    <div class="app-shell">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar-nav">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-cube-unfolded"></i>
+                <span class="font-heading">Architect Elite</span>
+            </a>
+
+            <nav class="nav-items">
+                <div class="nav-link active" onclick="scrollToCategory('todas')">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Toda la Librería</span>
+                </div>
+                <div class="nav-link" onclick="scrollToCategory('Estilo')">
+                    <i class="fa-solid fa-palette"></i>
+                    <span>Estilos Visuales</span>
+                </div>
+                <div class="nav-link" onclick="scrollToCategory('Toma')">
+                    <i class="fa-solid fa-video"></i>
+                    <span>Planos y Ángulos</span>
+                </div>
+                <div class="nav-link" onclick="scrollToCategory('Iluminación')">
+                    <i class="fa-solid fa-sun"></i>
+                    <span>Iluminación</span>
+                </div>
+                <div class="nav-link" onclick="scrollToCategory('Plataforma')">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Motores IA</span>
+                </div>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <p style="font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase;">Build v2.4.0 • 2025
+                </p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header-top">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Busca estilos, cámaras o atmósferas..."
+                        oninput="handleSearch(this.value)">
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button class="nav-link" title="Guardar Preset" style="background:transparent; border:none;">
+                        <i class="fa-regular fa-bookmark"></i>
+                    </button>
+                    <button class="nav-link" onclick="toggleTheme()" style="background:transparent; border:none;">
+                        <i class="fa-solid fa-circle-half-stroke"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="type-selector">
+                <button class="type-btn active" onclick="setMode('Imagen')">MODO IMAGEN</button>
+                <button class="type-btn" onclick="setMode('Video')">MODO VIDEO (AI-FILM)</button>
+            </div>
+
+            <div class="bento-grid" id="categories-grid">
+                <!-- Dynamite Content via JS -->
+            </div>
+        </main>
+
+        <!-- Preview Aside -->
+        <aside class="preview-aside">
+            <h2 class="font-heading">Visual Blueprint</h2>
+
+            <div class="preview-section">
+                <label class="section-label">
+                    <i class="fa-solid fa-pen-nib"></i> Sujeto de la Escena
+                </label>
+                <textarea id="subject-field" class="subject-area"
+                    placeholder="Describe el corazón de tu imagen... Ej: El último samurái bajo un cerezo eléctrico"
+                    oninput="updateMasterPrompt()"></textarea>
+            </div>
+
+            <div class="preview-section">
+                <label class="section-label" style="justify-content: space-between;">
+                    <span><i class="fa-solid fa-code"></i> Prompt Arquitectónico</span>
+                    <span id="char-count" style="font-size: 0.65rem; opacity: 0.5;">0 caracteres</span>
+                </label>
+                <div class="prompt-builder" id="prompt-display">
+                    Escribe un sujeto para comenzar...
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <span
+                        style="font-size: 0.65rem; padding: 4px 8px; background: var(--bg-color); border-radius: 4px; color: var(--primary);">#Midjourney</span>
+                    <span
+                        style="font-size: 0.65rem; padding: 4px 8px; background: var(--bg-color); border-radius: 4px; color: var(--secondary);">#Flux</span>
+                    <span
+                        style="font-size: 0.65rem; padding: 4px 8px; background: var(--bg-color); border-radius: 4px; color: var(--success);">#Sora</span>
+                </div>
+            </div>
+
+            <div class="action-group">
+                <button class="btn btn-primary" onclick="copyPrompt()">
+                    <i class="fa-regular fa-copy"></i> Copiar Prompt Elite
+                </button>
+                <button class="btn btn-secondary" onclick="resetArchitecture()">
+                    <i class="fa-solid fa-rotate-right"></i> Reiniciar Mesa
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Quick Navigation Dots -->
+    <div class="quick-nav" id="dot-nav-container"></div>
+
+    <script>
+        // High-end data structure
+        const DATA = {
+            "Estilo": [
+                { name: "Realista", img: "Realista.png", tag: "photorealistic" },
+                { name: "Cartoon", img: "cartoon.png", tag: "3d disney style" },
+                { name: "Anime", img: "anime.png", tag: "studio ghibli aesthetic" },
+                { name: "3D Render", img: "3drender.png", tag: "octane render 8k" },
+                { name: "Pixel Art", img: "pixelart.png", tag: "16-bit pixel art" },
+                { name: "Acuarela", img: "acuarela.png", tag: "delicate watercolor" },
+                { name: "Óleo", img: "oleo.png", tag: "classical oil painting" },
+                { name: "Surrealista", img: "surrealista.png", tag: "salvador dali surrealism" },
+                { name: "Cinemático", img: "cinematico.png", tag: "hollywood movie shot" },
+                { name: "Hyperrealista", img: "hyperrealista.png", tag: "unreal engine 5" },
+                { name: "Futurista", img: "futurista.png", tag: "solarpunk futuristic" },
+                { name: "Vintage", img: "vintage.png", tag: "1970s kodak film" },
+                { name: "Cyberpunk", img: "neoncyberpunk.png", tag: "cyberpunk 2077 neon" },
+                { name: "Minimalista", img: "minimalista.png", tag: "bauhaus minimalism" }
+            ],
+            "Toma": [
+                { name: "Primer plano", img: "primerplano.png", tag: "extreme close-up" },
+                { name: "Plano medio", img: "planomedio.png", tag: "medium shot" },
+                { name: "Plano general", img: "planogeneral.png", tag: "wide angle establishing shot" },
+                { name: "Vista cenital", img: "vistacenital.png", tag: "overhead drone view" },
+                { name: "Subjetiva", img: "vistasubjetiva.png", tag: "first person POV" },
+                { name: "Ángulo bajo", img: "angulobajo.png", tag: "heroic low angle" },
+                { name: "Ojo de pez", img: "ojopez.png", tag: "fisheye lens distortion" }
+            ],
+            "Iluminación": [
+                { name: "Golden Hour", img: "goldenhour.png", tag: "golden hour warm light" },
+                { name: "Blue Hour", img: "bluehour.png", tag: "cool blue hour twilight" },
+                { name: "Dramática", img: "dramatica.png", tag: "chiaroscuro noir lighting" },
+                { name: "Suave", img: "suavevolumetrica.png", tag: "soft volumetric lighting" },
+                { name: "Rim Light", img: "rimlight.png", tag: "striking rim light" },
+                { name: "Neón", img: "neon.png", tag: "vibrant neon glow" },
+                { name: "Estudio", img: "estudio.png", tag: "professional studio lighting" }
+            ],
+            "Atmósfera": [
+                { name: "Niebla", img: "niebla.png", tag: "mysterious fog" },
+                { name: "Lluvia", img: "lluviatorrencial.png", tag: "heavy cinematic rain" },
+                { name: "Nieve", img: "nieve.png", tag: "peaceful falling snow" },
+                { name: "Tormenta", img: "tormenta.png", tag: "thunderstorm lightning" },
+                { name: "Bruma", img: "brumamagica.png", tag: "magic Ethereal haze" }
+            ],
+            "Formato": [
+                { name: "Cuadrado", img: "cuadrado.png", tag: "--ar 1:1" },
+                { name: "Horizontal", img: "horizontal.png", tag: "--ar 16:9" },
+                { name: "Vertical", img: "vertical.png", tag: "--ar 9:16" },
+                { name: "Cine", img: "cine.png", tag: "--ar 2.35:1" }
+            ],
+            "Cámara (Video)": [
+                { name: "Pan Left", img: "panleft.png", tag: "camera panning left", videoOnly: true },
+                { name: "Zoom In", img: "zoomin.png", tag: "slow zoom in", videoOnly: true },
+                { name: "Dolly Out", img: "dollyout.png", tag: "dolly zoom out", videoOnly: true },
+                { name: "Orbit", img: "orbit.png", tag: "orbiting shot", videoOnly: true },
+                { name: "Handheld", img: "handheld.png", tag: "shaky handheld camera", videoOnly: true },
+                { name: "Crane Up", img: "craneup.png", tag: "jib crane shot up", videoOnly: true }
+            ],
+            "Sujeto (Video)": [
+                { name: "Caminando", img: "caminando.png", tag: "walking movement", videoOnly: true },
+                { name: "Corriendo", img: "corriendo.png", tag: "fast running", videoOnly: true },
+                { name: "Volando", img: "volando.png", tag: "soaring cinematic flight", videoOnly: true },
+                { name: "Nadando", img: "nadando.png", tag: "underwater swimming", videoOnly: true }
+            ],
+            "Plataforma": [
+                { name: "Midjourney", img: "midjourney.png", tag: "--v 6.1 --stylize 250" },
+                { name: "DALL-E 3", img: "dalle.png", tag: "openai dall-e high detail" },
+                { name: "Flux.1", img: "stablediffusion.png", tag: "flux latent model architecture" },
+                { name: "Gemini (Google)", img: "gemini.png", tag: "imagen 3 high fidelity, photorealistic, 4k resolution, google ai style" },
+                { name: "Nano Banana", img: "nanobanana.png", tag: "gemini 3 pro engine, in-context generation, consistent character, high-speed render" },
+                { name: "Grok (xAI)", img: "grok.png", tag: "aurora model, structured realism, xai grok style" },
+                { name: "Qwen (Alibaba)", img: "qwen.png", tag: "qwen-image bilingüe, precise text rendering, high fidelity" },
+                { name: "Z.ai", img: "zai.png", tag: "zai-turbo model, 1568x1056 hd, photorealistic lighting" },
+                { name: "Kling AI", img: "kling.png", tag: "high consistency video generation" },
+                { name: "Sora", img: "sora.png", tag: "openai sora high fidelity" },
+                { name: "Luma", img: "luma.png", tag: "dream machine high motion" }
+            ]
+        };
+
+        let currentMode = 'Imagen';
+        let selections = {};
+
+        function init() {
+            renderGrid();
+            renderDots();
+            setupTheme();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('categories-grid');
+            grid.innerHTML = '';
+
+            for (const [cat, items] of Object.entries(DATA)) {
+                const filtered = items.filter(i => !i.videoOnly || currentMode === 'Video');
+                if (filtered.length === 0) continue;
+
+                const section = document.createElement('section');
+                section.className = 'category-card';
+                section.id = `cat-${cat.replace(/\s/g, '-')}`;
+
+                section.innerHTML = `
+                    <div class="category-header">
+                        <h3 class="category-title">
+                            <i class="fa-solid fa-square-full"></i> ${cat}
+                        </h3>
+                    </div>
+                    <div class="chips-grid">
+                        ${filtered.map(opt => `
+                            <div class="chip ${selections[cat]?.name === opt.name ? 'active' : ''}" 
+                                 onclick="toggleSelection('${cat}', '${opt.name}')"
+                                 data-name="${opt.name.toLowerCase()}">
+                                <img src="${opt.img}" alt="${opt.name}" loading="lazy" onerror="this.parentElement.classList.add('img-error'); this.style.display='none';">
+                                <div class="overlay">
+                                    <span class="label">${opt.name}</span>
+                                </div>
+                                ${selections[cat]?.name === opt.name ? '<div class="checkmark"><i class="fa-solid fa-check"></i></div>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                grid.appendChild(section);
+            }
+        }
+
+        function toggleSelection(cat, name) {
+            const item = DATA[cat].find(i => i.name === name);
+            if (selections[cat]?.name === name) {
+                delete selections[cat];
+            } else {
+                selections[cat] = item;
+            }
+            renderGrid();
+            updateMasterPrompt();
+        }
+
+        function updateMasterPrompt() {
+            const subject = document.getElementById('subject-field').value.trim();
+            const display = document.getElementById('prompt-display');
+
+            if (!subject && Object.keys(selections).length === 0) {
+                display.innerHTML = '<span style="opacity:0.3">Diseña tu arquitectura visual seleccionando categorías...</span>';
+                return;
+            }
+
+            let promptHtml = `<span class="tag-block">${subject || "[Sujeto]"}</span>`;
+
+            // Order of appearance for semantic building
+            const order = ["Estilo", "Toma", "Iluminación", "Atmósfera", "Cámara (Video)", "Sujeto (Video)", "Formato", "Plataforma"];
+
+            order.forEach(key => {
+                if (selections[key]) {
+                    promptHtml += `, <span class="tag-block">${selections[key].tag}</span>`;
+                }
+            });
+
+            display.innerHTML = promptHtml;
+
+            // Analytics
+            document.getElementById('char-count').innerText = `${display.innerText.length} caracteres`;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.type-btn').forEach(b => {
+                b.classList.toggle('active', b.innerText.includes(mode.toUpperCase()));
+            });
+            renderGrid();
+            updateMasterPrompt();
+        }
+
+        function handleSearch(val) {
+            const search = val.toLowerCase();
+            document.querySelectorAll('.chip').forEach(chip => {
+                const matches = chip.dataset.name.includes(search);
+                chip.style.display = matches ? 'block' : 'none';
+            });
+            // Hide parent cards if empty
+            document.querySelectorAll('.category-card').forEach(card => {
+                const visible = card.querySelectorAll('.chip[style="display: block;"]').length > 0;
+                card.style.display = (visible || search === '') ? 'flex' : 'none';
+            });
+        }
+
+        function copyPrompt() {
+            const text = document.getElementById('prompt-display').innerText;
+            if (text.includes("Diseña tu arquitectura")) return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("¡Prompt Copiado!", "fa-circle-check");
+            });
+        }
+
+        function showToast(msg, icon) {
+            const host = document.getElementById('notification-host');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            host.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function resetArchitecture() {
+            selections = {};
+            document.getElementById('subject-field').value = '';
+            renderGrid();
+            updateMasterPrompt();
+            showToast("Mesa limpair", "fa-trash-can");
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        function setupTheme() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        }
+
+        function renderDots() {
+            const container = document.getElementById('dot-nav-container');
+            container.innerHTML = '';
+            const sections = document.querySelectorAll('.category-card');
+            sections.forEach((s, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot-nav';
+                dot.title = s.id.replace('cat-', '');
+                dot.onclick = () => s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                container.appendChild(dot);
+            });
+        }
+
+        function scrollToCategory(id) {
+            if (id === 'todas') {
+                document.querySelector('.main-content').scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            const el = document.getElementById(`cat-${id}`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
